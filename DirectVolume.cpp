@@ -150,6 +150,7 @@ void DirectVolume::handleDiskAdded(const char *devpath, NetlinkEvent *evt) {
     mDiskMajor = atoi(evt->findParam("MAJOR"));
     mDiskMinor = atoi(evt->findParam("MINOR"));
 
+#ifdef KERNEL_NPARTS
     const char *tmp = evt->findParam("NPARTS");
     if (tmp) {
         mDiskNumParts = atoi(tmp);
@@ -157,7 +158,9 @@ void DirectVolume::handleDiskAdded(const char *devpath, NetlinkEvent *evt) {
         SLOGW("Kernel block uevent missing 'NPARTS'");
         mDiskNumParts = 1;
     }
-
+#else
+    mDiskNumParts = 0;
+#endif
     int partmask = 0;
     int i;
     for (i = 1; i <= mDiskNumParts; i++) {
